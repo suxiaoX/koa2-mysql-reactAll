@@ -5,36 +5,25 @@ import { Form, Icon, Input, Button, Checkbox, message } from 'antd';
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { Postlogin } from '../../redux/actions/user';
-import user from '../../api/user';
+import { postLogin } from '../../redux/actions/user';
 const FormItem = Form.Item;
 
 @connect(
   (state) => ({}),
-  (dispatch) => bindActionCreators({ Postlogin }, dispatch)
+  (dispatch) => bindActionCreators({ postLogin }, dispatch)
 )
 class LoginForm extends Component {
   handleSubmit = async (e) => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        const data = {...values, id: 123};
-        console.log(data);
-        this.props.Postlogin(values).then(res => {
+        this.props.postLogin(values).then(res => {
           if (!res.code) {
             this.props.history.push('/blog/user')
           } else {
             message.error(`${res.msg}`)
           }
         })
-        // console.log(result);
-        /* .then(res => {
-          if (!res.code) {
-            this.props.history.push('/blog/user')
-          } else {
-            message.error(`${res.msg}`)
-          }
-        }) */
       }
     });
   }

@@ -26,7 +26,7 @@ export const getUserInfo = (params) => async (dispatch) => {
   }
 }
 
-export const Postlogin = (params) => async (dispatch) => {
+export const postLogin = (params) => async (dispatch) => {
   try {
     await dispatch(fetchRequset());
     const data = await user.login(params);
