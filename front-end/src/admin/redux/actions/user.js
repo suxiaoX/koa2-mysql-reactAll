@@ -1,5 +1,4 @@
 import * as type from '../constants/index';
-// import { get } from '../../utils/request';
 import user from '../../api/user';
 
 const fetchRequset = () => ({

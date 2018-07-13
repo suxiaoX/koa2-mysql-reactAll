@@ -22,6 +22,30 @@ const publicUrl = '';
 // Get environment variables to inject into our app.
 const env = getClientEnvironment(publicUrl);
 
+function setup() {
+  const entry = {};
+  const plugins = [];
+  Object.keys(paths.dirs).forEach((key) => {
+    entry[key] = [
+      require.resolve('./polyfills'),
+      require.resolve('react-dev-utils/webpackHotDevClient'),
+      paths.dirs[key]
+    ]
+
+    const newPlugins = new HtmlWebpackPlugin({
+      chunks: [key],
+      inject: true,
+      template: paths.appHtml,
+      filename: `${key}.html`
+    })
+
+    plugins.push(newPlugins);
+  })
+  return { entry, plugins }
+}
+
+const Setup = setup(); //这里要注意要运行一次！
+
 // This is the development configuration.
 // It is focused on developer experience and fast rebuilds.
 // The production configuration is different and lives in a separate file.
@@ -32,9 +56,11 @@ module.exports = {
   // These are the "entry points" to our application.
   // This means they will be the "root" imports that are included in JS bundle.
   // The first two entry points enable "hot" CSS and auto-refreshes for JS.
-  entry: [
+  entry: Setup.entry,
+  // entry: {
     // We ship a few polyfills by default:
-    require.resolve('./polyfills'),
+    /* 修改成多页面 */
+    /* require.resolve('./polyfills'), */
     // Include an alternative client for WebpackDevServer. A client's job is to
     // connect to WebpackDevServer by a socket and get notified about changes.
     // When you save a file, the client will either apply hot updates (in case
@@ -45,20 +71,34 @@ module.exports = {
     // the line below with these two lines if you prefer the stock client:
     // require.resolve('webpack-dev-server/client') + '?/',
     // require.resolve('webpack/hot/dev-server'),
-    require.resolve('react-dev-utils/webpackHotDevClient'),
+     /* 修改成多页面 */
+    /* require.resolve('react-dev-utils/webpackHotDevClient'), */
     // Finally, this is your app's code:
-    paths.appIndexJs,
+     /* 修改成多页面 */
+    /* paths.appIndexJs, */
     // We include the app code last so that if there is a runtime error during
     // initialization, it doesn't blow up the WebpackDevServer client, and
     // changing JS code would still trigger a refresh.
-  ],
+    /* index: [
+      require.resolve('./polyfills'),
+      require.resolve('react-dev-utils/webpackHotDevClient'),
+      paths.appIndexJs,
+    ],
+    admin: [
+      require.resolve('./polyfills'),
+      require.resolve('react-dev-utils/webpackHotDevClient'),
+      paths.appAdminJs,
+    ] */
+    
+  // },
   output: {
     // Add /* filename */ comments to generated require()s in the output.
     pathinfo: true,
     // This does not produce a real file. It's just the virtual path that is
     // served by WebpackDevServer in development. This is the JS bundle
     // containing code from all our entry points, and the Webpack runtime.
-    filename: 'static/js/bundle.js',
+    // filename: 'static/js/bundle.js',
+    filename: 'static/js/[name]bundle.js',
     // There are also additional JS chunk files if you use code splitting.
     chunkFilename: 'static/js/[name].chunk.js',
     // This is the URL that app is served from. We use "/" in development.
@@ -220,10 +260,23 @@ module.exports = {
     // In development, this will be an empty string.
     new InterpolateHtmlPlugin(env.raw),
     // Generates an `index.html` file with the <script> injected.
-    new HtmlWebpackPlugin({
+    /* new HtmlWebpackPlugin({
       inject: true,
       template: paths.appHtml,
+    }), */
+    /* new HtmlWebpackPlugin({
+      chunks: ['index'],
+      inject: true,
+      template: paths.appHtml,
+      filename: 'index.html'
     }),
+    new HtmlWebpackPlugin({
+      chunks: ['admin'],
+      inject: true,
+      template: paths.appHtml,
+      filename: 'admin.html'
+    }), */
+    ...Setup.plugins,
     // Add module names to factory functions so they appear in browser profiler.
     new webpack.NamedModulesPlugin(),
     // Makes some environment variables available to the JS code, for example:

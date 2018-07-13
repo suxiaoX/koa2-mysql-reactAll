@@ -49,6 +49,42 @@ const extractTextPluginOptions = shouldUseRelativeAssetPaths
 // This is the production configuration.
 // It compiles slowly and is focused on producing a fast and minimal bundle.
 // The development configuration is different and lives in a separate file.
+
+function setup() {
+  const entry = {};
+  const plugins = [];
+  Object.keys(paths.dirs).forEach((key) => {
+    entry[key] = [
+      require.resolve('./polyfills'),
+      require.resolve('react-dev-utils/webpackHotDevClient'),
+      paths.dirs[key]
+    ]
+
+    const newPlugins = new HtmlWebpackPlugin({
+      chunks: [key],
+      inject: true,
+      template: paths.appHtml,
+      filename: `${key}.html`,
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeRedundantAttributes: true,
+        useShortDoctype: true,
+        removeEmptyAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        keepClosingSlash: true,
+        minifyJS: true,
+        minifyCSS: true,
+        minifyURLs: true,
+      },
+    })
+
+    plugins.push(newPlugins);
+  })
+  return { entry, plugins }
+}
+
+const Setup = setup(); //这里要注意要运行一次！
 module.exports = {
   // Don't attempt to continue if there are any errors.
   bail: true,
@@ -56,7 +92,8 @@ module.exports = {
   // You can exclude the *.map files from the build during deployment.
   devtool: shouldUseSourceMap ? 'source-map' : false,
   // In production, we only want to load the polyfills and the app code.
-  entry: [require.resolve('./polyfills'), paths.appIndexJs],
+  entry: Setup.entry,
+  // entry: [require.resolve('./polyfills'), paths.appIndexJs],
   output: {
     // The build folder.
     path: paths.appBuild,
@@ -241,7 +278,7 @@ module.exports = {
     // in `package.json`, in which case it will be the pathname of that URL.
     new InterpolateHtmlPlugin(env.raw),
     // Generates an `index.html` file with the <script> injected.
-    new HtmlWebpackPlugin({
+    /* new HtmlWebpackPlugin({
       inject: true,
       template: paths.appHtml,
       minify: {
@@ -256,7 +293,8 @@ module.exports = {
         minifyCSS: true,
         minifyURLs: true,
       },
-    }),
+    }), */
+    ...Setup.plugins,
     // Makes some environment variables available to the JS code, for example:
     // if (process.env.NODE_ENV === 'production') { ... }. See `./env.js`.
     // It is absolutely essential that NODE_ENV was set to production here.

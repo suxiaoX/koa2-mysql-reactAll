@@ -8,6 +8,9 @@ const paths = require('./paths');
 
 const protocol = process.env.HTTPS === 'true' ? 'https' : 'http';
 const host = process.env.HOST || '0.0.0.0';
+const rewritesPath = Object.keys(paths.dirs).map((key) => {
+  return paths.dirs[key]
+})
 
 module.exports = function(proxy, allowedHost) {
   return {
@@ -78,6 +81,7 @@ module.exports = function(proxy, allowedHost) {
       // Paths with dots should still use the history fallback.
       // See https://github.com/facebookincubator/create-react-app/issues/387.
       disableDotRule: true,
+      // rewrites: rewritesPath, 
     },
     public: allowedHost,
     proxy,
